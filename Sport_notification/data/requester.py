@@ -1,0 +1,1 @@
+#todo implement requester and creation of objects for data from external api, worker with wait around 5 min
