@@ -43,7 +43,9 @@ def notify_live_subscriptions():
             Q(team_one__in=teams) | Q(team_one__in=teams),
             last_changed__gte=last_update
         )
-        notify_subscriber(subscription, matches)
+        if matches:
+            notify_subscriber(subscription, matches)
+        teams.update(trigger=False)
         subscription.sent = start_datetime
         subscription.save(update_fields=['sent'])
 
@@ -81,7 +83,7 @@ def notify_through_url(payload, url):
     #todo validate url somewhere
     if url and payload:
         pass
-        # r = requests.request('POST', url, timeout=60, json=payload)
+        r = requests.request('POST', url, timeout=60, json=payload)
 
 
 def notify_through_email(payload, email):
