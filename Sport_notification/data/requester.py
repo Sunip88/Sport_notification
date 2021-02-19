@@ -70,6 +70,7 @@ def format_matches(item):
         'ht_score': item.get('ht_score'),
         'ft_score': item.get('ft_score'),
         'et_score': item.get('et_score'),
+        'score': item.get('score'),
         'time': item.get('time'),
         'league_name': item.get('league_name'),
         'status': item.get('status'),
@@ -111,12 +112,14 @@ def get_fixtures():
                 team_two = create_team(fixture['away_id'], fixture['away_name'])
                 formatted_item_fixture['team_one'] = team_one
                 formatted_item_fixture['team_two'] = team_two
-                fixture, _ = Fixture.objects.update_or_create(
+                fixture, created = Fixture.objects.update_or_create(
                     external_id=external_id,
                     defaults=formatted_item_fixture
                 )
+                logger.info(f'Fixture created: {created}')
             if data.get('next_page'):
                 url = data.get('next_page')
+                logger.info(f'Get next page: {url}')
                 params = {}
 
 

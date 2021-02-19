@@ -15,11 +15,13 @@ class Command(BaseCommand):
             try:
                 logging.info('Started import - matches')
                 get_matches()
+                logging.info('Finished import - matches')
                 today = datetime.date.today()
                 if imported_date < today:
                     logging.info('Started import - fixtures')
                     get_fixtures()
                     imported_date = today
+                    logging.info('Finished import - fixtures')
             except Exception as exc:
                 logging.exception(exc)
             wait_time = 60*5

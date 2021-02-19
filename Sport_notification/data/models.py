@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.forms import model_to_dict
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,7 @@ class Match(models.Model):
     ht_score = models.CharField(max_length=64, null=True)
     ft_score = models.CharField(max_length=64, null=True)
     et_score = models.CharField(max_length=64, null=True)
+    score = models.CharField(max_length=64, null=True)
     time = models.CharField(max_length=32, null=True)
     league_name = models.CharField(max_length=128, null=True)
     last_changed = models.DateTimeField(null=True)
@@ -36,6 +38,15 @@ class Match(models.Model):
         self.team_one.save(update_fields=['trigger'])
         self.team_two.save(update_fields=['trigger'])
 
+    def email_format(self):
+        team_names = f"{self.team_one} - {self.team_two}, "
+        score = f"score: {self.score}, status: {self.status}, "
+        competition_name_location = f"Competition: {self.competition_name} in {self.location}"
+        return team_names + score + competition_name_location + '/n'
+
+    def serialize(self):
+        return model_to_dict(self)
+
 
 class Fixture(models.Model):
     external_id = models.CharField(max_length=64)
@@ -47,6 +58,15 @@ class Fixture(models.Model):
     start_datetime = models.DateTimeField()
     team_one = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='fixture_team_one')
     team_two = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='fixture_team_two')
+
+    def email_format(self):
+        team_names = f"{self.team_one} - {self.team_two}, "
+        competition_name_location = f"Competition: {self.competition_name} in {self.location}"
+        league_name_location = f"Competition: {self.league_name}"
+        return team_names + competition_name_location + league_name_location + '/n'
+
+    def serialize(self):
+        return model_to_dict(self)
 
 
 class Subscription(models.Model):
@@ -63,7 +83,8 @@ class Subscription(models.Model):
     notification_route = models.CharField(max_length=32, choices=Route.choices)
     teams = models.ManyToManyField(Team)
     sent = models.DateTimeField(null=True)
-
+    notification_url = models.TextField()
+    notification_email = models.TextField()
 
 class Subscriber(User):
     subscription_details = models.ForeignKey(Subscription, on_delete=models.CASCADE)

@@ -3,10 +3,14 @@ from django.shortcuts import render
 # Create your views here.
 from rest_framework import viewsets
 
-from Sport_notification.data.models import Team, Subscription
+from data.models import Team, Subscription
+
+from public_api.serializers import TeamSerializer
 
 
 class Teams(viewsets.ModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = TeamSerializer
     model = Team
 
 
