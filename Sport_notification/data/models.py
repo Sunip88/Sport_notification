@@ -11,13 +11,8 @@ class Team(models.Model):
     external_id = models.CharField(max_length=64)
     name = models.CharField(max_length=256)
 
-    def notify_subscriptions(self):
-        subscriptions = self.subscription_set.all()
-        for subscription in subscriptions:
-            subscription.notify()
 
-
-class Competition(models.Model):
+class Match(models.Model):
     external_id = models.CharField(max_length=64)
     competition_id = models.CharField(max_length=64)
     league_id = models.CharField(max_length=64)
@@ -32,14 +27,26 @@ class Competition(models.Model):
     last_changed = models.DateTimeField(null=True)
     added = models.DateTimeField(null=True)
     status = models.CharField(max_length=32)
-    team_one = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_one')
-    team_two = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='team_two')
+    team_one = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='match_team_one')
+    team_two = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='match_team_two')
 
     def set_trigger(self):
         self.team_one.trigger = True
         self.team_two.trigger = True
         self.team_one.save(update_fields=['trigger'])
         self.team_two.save(update_fields=['trigger'])
+
+
+class Fixture(models.Model):
+    external_id = models.CharField(max_length=64)
+    competition_id = models.CharField(max_length=64)
+    competition_name = models.CharField(max_length=128)
+    league_id = models.CharField(max_length=64)
+    league_name = models.CharField(max_length=128, null=True)
+    location = models.CharField(max_length=128)
+    start_datetime = models.DateTimeField()
+    team_one = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='fixture_team_one')
+    team_two = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='fixture_team_two')
 
 
 class Subscription(models.Model):
@@ -54,11 +61,8 @@ class Subscription(models.Model):
 
     notification_type = models.CharField(max_length=32, choices=Type.choices)
     notification_route = models.CharField(max_length=32, choices=Route.choices)
-    subscription = models.ForeignKey(Team, on_delete=models.CASCADE)
-    #todo implement notify for different methods and different types
-
-    def notify(self):
-        pass
+    teams = models.ManyToManyField(Team)
+    sent = models.DateTimeField(null=True)
 
 
 class Subscriber(User):

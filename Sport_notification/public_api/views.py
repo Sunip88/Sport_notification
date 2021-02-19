@@ -15,5 +15,5 @@ class Subscriptions(viewsets.ModelViewSet):
     #todo implement create subscription
     
 
-class TeamCompetitions(viewsets.ModelViewSet):
+class TeamMatches(viewsets.ModelViewSet):
     pass  #todo list Teams for current user and their last, current and next competition

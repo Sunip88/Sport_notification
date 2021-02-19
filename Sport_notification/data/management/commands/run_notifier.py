@@ -1,23 +1,22 @@
 import logging
 import time
 from django.core.management.base import BaseCommand
+import schedule
 
-from data.models import Team
+from data.jobs import notify_weekly_subscriptions, notify_daily_subscriptions, notify_live_subscriptions
 
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         logging.root.setLevel(logging.INFO)
+
+        schedule.every().monday.at('08:00').do(notify_weekly_subscriptions())
+        schedule.every().day.at('08:00').do(notify_daily_subscriptions())
+        schedule.every(5).minutes.do(notify_live_subscriptions())
         while True:
             try:
-                logging.info('Checking triggers')
-                teams = Team.objects.filter(trigger=True)
-                for team in teams:
-                    logging.info(f'Team {team.name} is triggered')
-                    team.notify_subscriptions()
-                teams.update(trigger=False)
+                schedule.run_pending()
+                time.sleep(1)
             except Exception as exc:
                 logging.exception(exc)
-            wait_time = 60
-            logging.info(f'Finished, waiting: {wait_time} s.')
-            time.sleep(wait_time)
+                time.sleep(10)
