@@ -83,9 +83,10 @@ class Subscription(models.Model):
     notification_route = models.CharField(max_length=32, choices=Route.choices)
     teams = models.ManyToManyField(Team)
     sent = models.DateTimeField(null=True)
-    notification_url = models.TextField()
-    notification_email = models.TextField()
+    notification_url = models.TextField(null=True, blank=True)
+    notification_email = models.TextField(null=True, blank=True)
 
-class Subscriber(User):
+
+class Subscriber(models.Model):
+    token = models.TextField()
     subscription_details = models.ForeignKey(Subscription, on_delete=models.CASCADE)
-

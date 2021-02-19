@@ -78,7 +78,10 @@ def format_email_route(objects):
 
 
 def notify_through_url(payload, url):
-    r = requests.request('POST', url, timeout=60, json=payload)
+    #todo validate url somewhere
+    if url and payload:
+        pass
+        # r = requests.request('POST', url, timeout=60, json=payload)
 
 
 def notify_through_email(payload, email):

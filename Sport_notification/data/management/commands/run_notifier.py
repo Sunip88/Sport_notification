@@ -10,9 +10,9 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         logging.root.setLevel(logging.INFO)
 
-        schedule.every().monday.at('08:00').do(notify_weekly_subscriptions())
-        schedule.every().day.at('08:00').do(notify_daily_subscriptions())
-        schedule.every(5).minutes.do(notify_live_subscriptions())
+        schedule.every().monday.at('08:00').do(notify_weekly_subscriptions)
+        schedule.every().day.at('08:00').do(notify_daily_subscriptions)
+        schedule.every(5).minutes.do(notify_live_subscriptions)
         while True:
             try:
                 schedule.run_pending()
